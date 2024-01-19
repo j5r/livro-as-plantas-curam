@@ -1,0 +1,169 @@
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{xstring}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[portuguese]{babel}
+\usepackage[left=2cm,top=2cm,right=3cm,bottom=3cm]{geometry}
+\usepackage[makeindex]{imakeidx}
+\makeindex[name=doencasix,title={Índice de doenças},columns=3,options=-t doencasix.ilg -s lou3.ist ]
+\makeindex[name=plantasix,title={Índice de plantas},columns=4,options=-t plantasix.ilg -s lou3.ist ]
+\usepackage{multicol}
+%
+% fontes
+%\usepackage{Alegreya}
+
+\usepackage{PTSansNarrow}
+\renewcommand*\familydefault{\sfdefault}
+
+%\usepackage{DejaVuSerifCondensed}
+
+%\usepackage[sfdefault]{GoSans}
+
+%\usepackage[nf]{coelacanth}
+%\let\oldnormalfont\normalfont
+%\def\normalfont{\oldnormalfont\mdseries}
+%
+%
+%
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=magenta,
+}
+%%%%%%%%%%%%%%%%%%%%%
+%%% não mexer
+%%
+%%
+%%
+\AtBeginDocument{
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INICIO
+\frontmatter
+\maketitle
+\tableofcontents
+\thispagestyle{empty}
+\cleardoublepage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONTEUDO
+\mainmatter
+%%
+}
+%%% não mexer
+%%
+%%
+%%
+\ExplSyntaxOn
+\cs_set_eq:NN\texttitlecasefirst\text_titlecase_first:n
+\ExplSyntaxOff
+%%
+%%
+%%
+%%% não mexer
+\renewcommand*{\baselinestretch}{1.1}
+\newcommand{\urlPesquisaImagem}[1]{\href{https://www.google.com/search?q="#1"&tbm=isch}{[#1]}}
+%
+\newcommand{\Pesquisa}[2][]{\ifx&#1&\href{https://www.google.com/search?q=#2}{\texttitlecasefirst{#2}}\else\href{https://www.google.com/search?q=#1}{\texttitlecasefirst{#2}}\fi}
+%
+\newcommand{\PLANTA}[2]{
+    \ifjrexisteimpressaoplanta
+    \ImprimirPlanta
+    \fi
+    \def\jrplantanome{\texttitlecasefirst{#1}}
+    \def\jrplantaformatado{\large \bf{\color{Cyan} [\href{#2}{\jrplantanome}] <<}}
+    \jrexisteimpressaoplantatrue
+    \index[plantasix]{\jrplantanome}
+    }
+
+\newcommand{\cnome}[1]{
+    \texttt{\urlPesquisaImagem{\texttitlecasefirst{#1}}}
+    }
+\newcommand{\NOMECIENTIFICO}[1]{
+    \def\jrnomecientifico{#1}
+    }
+\newcommand{\FAMILIA}[1]{\def\jrfamilia{\texttitlecasefirst{#1}}\jrfamiliatrue}
+\newcommand{\AVISOS}[1]{\jravisostrue\def\jravisos{#1}}
+\newcommand{\DESCRICAO}[1]{\def\jrdescricao{#1}\jrdescricaotrue}
+\newcommand{\OUTROSNOMES}[1]{\def\jroutrosnomes{#1}\jroutrosnomestrue}
+\newcommand{\USOMEDICINAL}[1]{\def\jrdoencas{#1}\jrdoencastrue}%doencas
+\newcommand{\jrindex}[2]{\index[doencasix]{\texttitlecasefirst{#1}!#2}}
+\newcommand{\umed}[2][]{
+\ifx&#1& %um argumento
+[\texttitlecasefirst{#2}]\jrindex{#2}{\jrplantanome}
+\else % dois argumentos
+[\texttitlecasefirst{#2} (#1)]
+\jrindex{#2 [#1]}{\jrplantanome}
+\fi
+}
+%https://tex.stackexchange.com/questions/217757/special-behavior-if-optional-argument-is-not-passed
+%%%
+%% construindo
+% \newif\ifNOME
+% setting: \NOMEtrue ou \NOMEfalse
+% testing: \ifNOME ...\else ... \fi
+\newif\ifjroutrosnomes\jroutrosnomesfalse
+\newif\ifjravisos\jravisosfalse
+\newif\ifjrexisteimpressaoplanta\jrexisteimpressaoplantafalse
+\newif\ifjrfamilia\jrfamiliafalse
+\newif\ifjrdescricao\jrdescricaofalse
+\newif\ifjrdoencas\jrdoencasfalse
+\newif\ifjrparteusada\jrparteusadafalse
+\newif\ifjrdose\jrdosefalse
+%%
+
+
+
+\newcommand{\PARTEUSADA}[1]{\def\jrparteusada{#1}\jrparteusadatrue}
+\newcommand{\DOSE}[1]{\def\jrdose{#1}\jrdosetrue}
+
+\newcommand{\ImprimirPlanta}{
+    \phantomsection
+    \addcontentsline{toc}{subsection}{\jrplantanome} \,\\
+    %
+    \noindent\bf $\bullet$ \jrplantaformatado \normalfont \small \jrnomecientifico \normalfont\\
+    %
+    %\ifx&\jrnomecientifico&
+    %!!NOMECIENTIFICO \verb|\cnome{}\cnome{}\cnome{}|\\
+    %\fi
+    \def\jrnomecientifico{}\def\jrplantaformatado{}
+    %%%
+    \ifjroutrosnomes
+    \indent{\it\color{Orchid} Outros nomes\dotfill\small\jroutrosnomes\jroutrosnomesfalse}\;\;\;\;\;\\ 
+    \def\jroutrosnomes{}
+    \else
+    !!OUTROSNOMES\\
+    \fi
+    %%%
+    \ifjrfamilia
+    \indent{\color{Periwinkle} {\bf FAMÍLIA:} \sc \jrfamilia}\\ \def\jrfamilia{}\jrfamiliafalse
+    \else
+    !!FAMILIA\\
+    \fi
+    %%%
+    \ifjrdescricao
+    \indent{\color{PineGreen}{\bf DESCRIÇÃO:} \jrdescricao\jrdescricaofalse}\\ \def\jrdescricao{}
+    \fi
+    %%%
+    \ifjrdoencas
+    \indent{\color{Cerulean}{\bf USO MEDICINAL:} \jrdoencas\jrdoencasfalse}\\ \def\jrdoencas{}
+    \else
+    !!USOMEDICINAL \verb|\umed{},,\umed{}..| \\
+    \fi
+    %%%
+    \ifjrparteusada
+    \indent{\color{CadetBlue}{\bf PARTE USADA:} \jrparteusada\jrparteusadafalse}\\ \def\jrparteusada{}
+    \else
+    !!PARTEUSADA\\
+    \fi
+    %%%
+    \ifjrdose
+    \indent{\color{DarkOrchid}{\bf DOSE:} \jrdose\jrdosefalse}\\ \def\jrdose{}
+    \else
+    !!DOSE\\
+    \fi
+    %%%
+    \ifjravisos
+    \indent{\color{Red}{\bf ATENÇÃO:} \jravisos\jravisosfalse} \def\jravisos{}
+    \fi      
+    }
+    
+\newcommand{\grupo}[1]{$\Big\lceil\!\!\Big\lceil$#1$\Big\rfloor\!\!\Big\rfloor$}

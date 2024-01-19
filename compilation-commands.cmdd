@@ -1,0 +1,3 @@
+pdflatex.exe -synctex=1 -interaction=nonstopmode plantas.tex
+makeindex.exe plantas.idx
+pdflatex.exe -synctex=1 -interaction=nonstopmode plantas.tex
